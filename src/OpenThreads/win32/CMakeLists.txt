@@ -53,4 +53,13 @@ INSTALL(
     COMPONENT libopenthreads-dev
 )
 
+install(
+    FILES
+        "$<TARGET_PDB_FILE:${LIB_NAME}>"
+    DESTINATION
+        bin
+    COMPONENT
+        libopenscenegraph-dev
+)
+
 #commented out# INCLUDE(ModuleInstall OPTIONAL)

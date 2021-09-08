@@ -32,6 +32,17 @@ INSTALL(
     ARCHIVE DESTINATION ${INSTALL_ARCHIVEDIR} COMPONENT libopenscenegraph-dev    
 )
 
+IF(MSVC)
+    install(
+        FILES
+            "$<TARGET_PDB_FILE:${LIB_NAME}>"
+        DESTINATION
+            ${INSTALL_BINDIR}
+        COMPONENT
+            libopenscenegraph-dev
+    )
+ENDIF()
+
 IF(NOT OSG_COMPILE_FRAMEWORKS)
     INSTALL (
         FILES        ${TARGET_H}
