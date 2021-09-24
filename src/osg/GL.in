@@ -17,7 +17,7 @@
 #include <osg/Config>
 #include <osg/Export>
 #include <osg/Types>
- 
+
 #cmakedefine OSG_GL1_AVAILABLE
 #cmakedefine OSG_GL2_AVAILABLE
 #cmakedefine OSG_GL3_AVAILABLE
@@ -109,6 +109,9 @@
     #define GL_GLEXT_PROTOTYPES 1
 #endif
 
+#if defined(OSG_GLES2_AVAILABLE)
+    #define GL_GLEXT_PROTOTYPES 1
+#endif
 
 @OPENGL_HEADER1@
 @OPENGL_HEADER2@

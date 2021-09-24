@@ -5,6 +5,14 @@ INCLUDE (CheckLibraryExists)
 INCLUDE (CheckSymbolExists)
 INCLUDE (CheckCXXSourceCompiles)
 
+include(
+	../../../rogii/utils/SetupRpathLink.cmake
+)
+
+include(
+	../../../rogii/utils/Rpath.cmake
+)
+
 SET(LIB_NAME OpenThreads)
 SET(TARGET_H ${OpenThreads_PUBLIC_HEADERS})
 
@@ -120,15 +128,19 @@ ELSE()
     )
 
     IF(OPENTHREADS_SONAMES)
-          SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES VERSION ${OPENTHREADS_VERSION} SOVERSION ${OPENTHREADS_SOVERSION})
+          SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES VERSION ${OPENTHREADS_VERSION} SOVERSION ${OPENTHREADS_VERSION})
     ENDIF()
 
 
     SET(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES_SAFE}")
 
+
     TARGET_LINK_LIBRARIES(${LIB_NAME}
         ${CMAKE_THREAD_LIBS_INIT}
     )
+
+	SETUP_RPATH_LINK(${LIB_NAME})
+    SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES PREFIX "")
 
     # Since we're building different platforms binaries in 
     # their respective directories, we need to set the 

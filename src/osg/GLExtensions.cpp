@@ -332,7 +332,11 @@ OSG_INIT_SINGLETON_PROXY(GLExtensionDisableStringInitializationProxy, osg::getGL
     #elif defined(WIN32)
 
         #if defined(OSG_GLES2_AVAILABLE)
-            static HMODULE hmodule = GetModuleHandle(TEXT("libGLESv2.dll"));
+            #ifdef _DEBUG
+                static HMODULE hmodule = GetModuleHandle(TEXT("libGLESv2d.dll"));
+            #else
+                static HMODULE hmodule = GetModuleHandle(TEXT("libGLESv2.dll"));
+            #endif
             return convertPointerType<void*, PROC>(GetProcAddress(hmodule, funcName));
         #elif defined(OSG_GLES1_AVAILABLE)
             static HMODULE hmodule = GetModuleHandleA(TEXT("libgles_cm.dll"));
@@ -1034,7 +1038,7 @@ GLExtensions::GLExtensions(unsigned int contextID)
         glGenerateMipmap != 0 &&
         glGetRenderbufferParameteriv != 0 &&
     ( OSG_GLES1_FEATURES || isGLExtensionOrVersionSupported(contextID, "GL_EXT_framebuffer_object",3.0f) );
-      
+
 
     isPackedDepthStencilSupported = OSG_GL3_FEATURES ||
         (isGLExtensionSupported(contextID, "GL_EXT_packed_depth_stencil")) ||
@@ -1077,7 +1081,7 @@ GLExtensions::GLExtensions(unsigned int contextID)
     osg::setGLExtensionFuncPtr(glBindVertexArray,"glBindVertexArray");
     osg::setGLExtensionFuncPtr(glDeleteVertexArrays,"glDeleteVertexArrays");
     osg::setGLExtensionFuncPtr(glIsVertexArray,"glIsVertexArray");
-    
+
 }
 
 

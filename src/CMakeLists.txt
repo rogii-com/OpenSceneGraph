@@ -28,14 +28,13 @@ FOREACH( mylibfolder
         osgVolume
         osgWrappers/serializers
         osgWrappers/deprecated-dotosg
-        osgPlugins
     )
 
     ADD_SUBDIRECTORY(${mylibfolder})
 
 ENDFOREACH()
 
-IF ((QT4_FOUND OR Qt5Widgets_FOUND) AND NOT ANDROID)
+IF ((QT4_FOUND OR Qt5Widgets_FOUND) AND NOT ANDROID AND NOT OSG_QT_ANGLE)
     ADD_SUBDIRECTORY(osgQt)
 ENDIF()
 

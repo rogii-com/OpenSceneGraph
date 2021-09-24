@@ -1,15 +1,10 @@
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-IF(WIN32)
-    CMAKE_MINIMUM_REQUIRED(VERSION 2.4.6 FATAL_ERROR)
-ELSE(WIN32)
-    IF(APPLE)
-        CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
-    ELSE(APPLE)
-        CMAKE_MINIMUM_REQUIRED(VERSION 2.4.4 FATAL_ERROR)
-    ENDIF(APPLE)
-ENDIF(WIN32)
+cmake_minimum_required(
+	VERSION
+	3.12.4
+)
 
 if(COMMAND cmake_policy)
     # Works around warnings libraries linked against that don't
@@ -19,6 +14,12 @@ if(COMMAND cmake_policy)
     # Works around warnings about escaped quotes in ADD_DEFINITIONS
     # statements.
     cmake_policy(SET CMP0005 NEW)
+
+    cmake_policy(
+        SET
+        CMP0007
+        NEW
+    )
 
     # tell CMake to prefer CMake's own CMake modules when available
     # only available from cmake-2.8.4
@@ -51,16 +52,32 @@ endif()
 
 PROJECT(OpenSceneGraph)
 
-SET(OPENSCENEGRAPH_MAJOR_VERSION 3)
-SET(OPENSCENEGRAPH_MINOR_VERSION 4)
-SET(OPENSCENEGRAPH_PATCH_VERSION 0)
-SET(OPENSCENEGRAPH_SOVERSION 130)
+
+set(
+    ROGII_FOLDER_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/rogii"
+)
+
+include(${ROGII_FOLDER_PATH}/version.cmake)
+include(${ROGII_FOLDER_PATH}/npm/Include.cmake)
+include(${ROGII_FOLDER_PATH}/environment.cmake)
+
+include(${ROGII_FOLDER_PATH}/utils/SetupRpathLink.cmake)
+include(${ROGII_FOLDER_PATH}/utils/Rpath.cmake)
+
+CNPM_PREPARE_PACKAGES(
+    DEFAULT_REPOSITORY_URLS
+    "$ENV{CNPM_URLS}"
+)
+
+if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+    # To fix x86 build with Angle (see https://bugreports.qt.io/browse/QTBUG-33534)
+    add_definitions(-DQT_OPENGL_ES_2)
+endif()
 
 # set to 0 when not a release candidate, non zero means that any generated
 # svn tags will be treated as release candidates of given number
 SET(OPENSCENEGRAPH_RELEASE_CANDIDATE 0)
-
-SET(OPENSCENEGRAPH_VERSION ${OPENSCENEGRAPH_MAJOR_VERSION}.${OPENSCENEGRAPH_MINOR_VERSION}.${OPENSCENEGRAPH_PATCH_VERSION})
 
 SET(OSG_PLUGINS osgPlugins-${OPENSCENEGRAPH_VERSION})
 
@@ -227,6 +244,21 @@ IF(APPLE)
 
     OPTION(OSG_COMPILE_FRAMEWORKS "compile frameworks instead of dylibs (experimental)" OFF)
     SET(OSG_COMPILE_FRAMEWORKS_INSTALL_NAME_DIR "@executable_path/../Frameworks" CACHE STRING "install name dir for compiled frameworks")
+ELSEIF(OSG_QT_ANGLE)
+    set(
+        OPENGL_INCLUDE_DIR
+        ${Qt5Gui_OPENGL_INCLUDE_DIRS}
+    )
+
+    set(
+        OPENGL_gl_LIBRARY
+        Qt5::Gui_GLESv2
+    )
+
+    set(
+        OPENGL_egl_LIBRARY
+        Qt5::Gui_EGL
+    )
 ELSE()
     # Non-Apple: Find OpenGL
     FIND_PACKAGE(OpenGL)
@@ -402,7 +434,7 @@ OPTION(OSG_USE_REF_PTR_IMPLICIT_OUTPUT_CONVERSION "Set to ON to use the ref_ptr<
 
 
 # Map the OPENGL_PROFILE to OSG_GL*_AVAILABLE settings
-SET(OPENGL_PROFILE "GL2" CACHE STRING "OpenGL Profile to use, choose from GL1, GL2, GL3, GLES1, GLES2, GLES3")
+SET(OPENGL_PROFILE "GLES2" CACHE STRING "OpenGL Profile to use, choose from GL1, GL2, GL3, GLES1, GLES2, GLES3")
 
 IF ((OPENGL_PROFILE STREQUAL "GL1") OR (OPENGL_PROFILE STREQUAL "GL2"))
     OPTION(OSG_GL1_AVAILABLE "Set to OFF to disable use of OpenGL 1.x functions library." ON )
@@ -430,6 +462,7 @@ ENDIF()
 
 IF ((OPENGL_PROFILE STREQUAL "GLES2"))
     OPTION(OSG_GLES2_AVAILABLE "Set to OFF to disable use of OpenGL ES 2.x functions library." ON )
+    OPTION(OSG_GL3_AVAILABLE "Set to OFF to disable use of OpenGL 3.x functions library." ON )
 ELSEIF ((OPENGL_PROFILE STREQUAL "GLES3"))
     OPTION(OSG_GLES2_AVAILABLE "Set to OFF to disable use of OpenGL ES 2.x functions library." ON )
     OPTION(OSG_GLES3_AVAILABLE "Set to OFF to disable use of OpenGL ES 3.x functions library." ON )
@@ -439,7 +472,7 @@ ELSE()
 ENDIF()
 
 
-OPTION(OSG_GL_LIBRARY_STATIC "Set to ON to statically link with OpenGL/GLES library." OFF)
+ OPTION(OSG_GL_LIBRARY_STATIC "Set to ON to statically link with OpenGL/GLES library." OFF)
 
 SET(OPENGL_egl_LIBRARY CACHE STRING "Set the OpenGL egl library.")
 
@@ -1270,7 +1303,7 @@ SET(PKGCONFIG_FILES
   openscenegraph-osgVolume
 )
 
-IF(QT4_FOUND OR Qt5Widgets_FOUND )
+IF((QT4_FOUND OR Qt5Widgets_FOUND) AND (NOT OSG_QT_ANGLE))
   SET(PKGCONFIG_FILES ${PKGCONFIG_FILES} openscenegraph-osgQt)
 ENDIF()
 
