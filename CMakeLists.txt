@@ -244,27 +244,16 @@ IF(APPLE)
 
     OPTION(OSG_COMPILE_FRAMEWORKS "compile frameworks instead of dylibs (experimental)" OFF)
     SET(OSG_COMPILE_FRAMEWORKS_INSTALL_NAME_DIR "@executable_path/../Frameworks" CACHE STRING "install name dir for compiled frameworks")
-ELSEIF(OSG_QT_ANGLE)
-    set(
-        OPENGL_INCLUDE_DIR
-        ${Qt5Gui_OPENGL_INCLUDE_DIRS}
-    )
-
+ELSEIF(OSG_USE_SS_OWN_ANGLE)
     set(
         OPENGL_gl_LIBRARY
-        Qt5::Gui_GLESv2
-    )
-
-    set(
-        OPENGL_egl_LIBRARY
-        Qt5::Gui_EGL
+        angle::glesv2
     )
 ELSE()
     # Non-Apple: Find OpenGL
     FIND_PACKAGE(OpenGL)
 ENDIF()
 ENDIF()
-
 
 
 
@@ -1303,7 +1292,7 @@ SET(PKGCONFIG_FILES
   openscenegraph-osgVolume
 )
 
-IF((QT4_FOUND OR Qt5Widgets_FOUND) AND (NOT OSG_QT_ANGLE))
+IF((QT4_FOUND OR Qt5Widgets_FOUND) AND (NOT OSG_USE_SS_OWN_ANGLE))
   SET(PKGCONFIG_FILES ${PKGCONFIG_FILES} openscenegraph-osgQt)
 ENDIF()
 
