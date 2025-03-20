@@ -77,7 +77,7 @@ set(
 if(WIN32)
     set(
         ANGLE
-        -DOSG_QT_ANGLE=ON
+        -DOSG_USE_SS_OWN_ANGLE=ON
     )
 endif()
 
