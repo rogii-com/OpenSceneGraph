@@ -8,7 +8,7 @@ if(OSG_USE_SS_OWN_ANGLE)
         VERSION
             6778.0.0
         BUILD_NUMBER
-            13
+            14
         TAG
             "sdk22621_vsbt22"
     )
