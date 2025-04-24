@@ -332,11 +332,7 @@ OSG_INIT_SINGLETON_PROXY(GLExtensionDisableStringInitializationProxy, osg::getGL
     #elif defined(WIN32)
 
         #if defined(OSG_GLES2_AVAILABLE)
-            #ifdef _DEBUG
-                static HMODULE hmodule = GetModuleHandle(TEXT("libGLESv2d.dll"));
-            #else
-                static HMODULE hmodule = GetModuleHandle(TEXT("libGLESv2.dll"));
-            #endif
+            static HMODULE hmodule = GetModuleHandle(TEXT("libGLESv2.dll"));
             return convertPointerType<void*, PROC>(GetProcAddress(hmodule, funcName));
         #elif defined(OSG_GLES1_AVAILABLE)
             static HMODULE hmodule = GetModuleHandleA(TEXT("libgles_cm.dll"));
