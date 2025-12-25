@@ -10,6 +10,27 @@ if(
     return()
 endif()
 
+set(
+    OSG_ANGLE_INTERFACE_LIBS
+    ""
+)
+
+if(TARGET angle::glesv2)
+	list(
+		APPEND
+			OSG_ANGLE_INTERFACE_LIBS
+			angle::glesv2
+	)
+endif()
+
+if(TARGET angle::egl)
+	list(
+		APPEND
+			OSG_ANGLE_INTERFACE_LIBS
+			angle::egl
+	)
+endif()
+
 # ===================================================================
 add_library(
     osg::threads
@@ -438,6 +459,21 @@ foreach(COMPONENT_NAME ${COMPONENT_NAMES})
         EXCLUDE_FROM_ALL
     )
 endforeach()
+
+if(OSG_ANGLE_INTERFACE_LIBS)
+    foreach(OSG_TARGET osg::threads osg::library osg::util osg::db osg::ga osg::text osg::viewer)
+        if(TARGET ${OSG_TARGET})
+            set_property(
+                TARGET
+                    ${OSG_TARGET}
+                APPEND
+                PROPERTY
+                    INTERFACE_LINK_LIBRARIES
+                    ${OSG_ANGLE_INTERFACE_LIBS}
+            )
+        endif()
+    endforeach()
+endif()
 
 # ===================================================================
 set(
